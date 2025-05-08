@@ -2,10 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 import env from 'dotenv'
-import usersController from './controllers/user.controller.js'
-import mailController from './controllers/mail.controller.js'
-import timetablesController from './controllers/timetable.controller.js'
-import pendingUserController from './controllers/pendingUser.controller.js'
+import { router, userRouter, getRouter } from './routes/route.js'
 import cookieParser from 'cookie-parser'
 
 const app = express();
@@ -28,10 +25,9 @@ mongoose.connect(process.env.MONGODB_URL, {
   console.log('Connected to MongoDB'));
 
 // Middleware and routes setup
-app.use('/api', pendingUserController);
-app.use('/api', usersController);
-app.use('/api', mailController);
-app.use('/api', timetablesController);
+app.use('/api', router);
+app.use('/api/user', userRouter);
+app.use('/api/get', getRouter);
 
 // Start the server
 app.listen(PORT, () => {

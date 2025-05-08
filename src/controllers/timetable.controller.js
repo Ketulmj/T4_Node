@@ -1,11 +1,9 @@
-import { Router } from 'express';
-const router = Router();
 import { deleteTimetable, getTimetableDataByOrgId, getTimetable, insertTimetableData } from '../services/timetable.service.js';
 import { addScheduleToTeacher, getTeacherScheduleList } from '../services/user.service.js';
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-router.get('/get/timetable-metadata', async (req, res) => {
+export const getTTmetadata = async (req, res) => {
     const timetablesWholeData = await getTimetableDataByOrgId(req.query.OrgId);
     const timetables = timetablesWholeData.map(tt => ({
         id: tt.Id,
@@ -13,12 +11,12 @@ router.get('/get/timetable-metadata', async (req, res) => {
         year: tt.Year,
     }));
     res.json({ timetables });
-});
+};
 
-router.get('/delete/timetable', async (req, res) => {
+export const deleteTT = async (req, res) => {
     await deleteTimetable(req.query.id);
     res.json({ error: false, result: "TimeTable Deleted" });
-});
+};
 
 async function getScheduleListForAllTeachers(teachers) {
     const x = {};
@@ -29,14 +27,14 @@ async function getScheduleListForAllTeachers(teachers) {
     return x;
 }
 
-router.get('/get/timetable', async (req, res) => {
+export const getTT = async (req, res) => {
     const className = req.query.class;
     const orgId = req.query.orgId;
     const tt = await getTimetable(className, orgId);
     res.json({ timetable: tt });
-});
+};
 
-router.post('/upload/timetable', async (req, res) => {
+export const uploadTimetable = async (req, res) => {
     const TT = req.body;
     await insertTimetableData(TT.TimeTable);
 
@@ -51,9 +49,9 @@ router.post('/upload/timetable', async (req, res) => {
         });
     }
     res.json({ status: 200, result: "TimeTable Created" });
-});
+};
 
-router.post('/generate/timetable', async (req, res) => {
+export const generateTimetable = async (req, res) => {
     const TimeTable = req.body;
     const subjects = TimeTable.Subjects;
     const tt = Array.from({ length: days.length }, () => []);
@@ -130,6 +128,4 @@ router.post('/generate/timetable', async (req, res) => {
         LabDuration: TimeTable.LabDuration
     };
     res.json({ status: 200, generatedTT, scheduledTeachers });
-});
-
-export default router;
+};
