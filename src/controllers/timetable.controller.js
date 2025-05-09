@@ -6,7 +6,7 @@ const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 export const getTTmetadata = async (req, res) => {
     const timetablesWholeData = await getTimetableDataByOrgId(req.query.OrgId);
     const timetables = timetablesWholeData.map(tt => ({
-        id: tt.Id,
+        id: tt._id,
         className: tt.Class,
         year: tt.Year,
     }));
@@ -52,7 +52,28 @@ export const uploadTimetable = async (req, res) => {
 };
 
 export const generateTimetable = async (req, res) => {
-    const TimeTable = req.body;
+    const data = req.body;
+    const TimeTable = {
+        OrgId: data.orgId,
+        Class: data.class,
+        Year: data.year,
+        Subjects: [
+            ...data.subjects.map(s => ({
+                Name: s.name,
+                IsLab: s.isLab,
+                Teacher: {
+                    TeacherId: s.teacher.teacherId,
+                    Name: s.teacher.name
+                }
+            }))
+        ],
+        HoursPerDay: data.hoursPerDay,
+        BreakStartTime: data.breakStartTime,
+        BreakDuration: data.breakDuration,
+        PeriodDuration: data.periodDuration,
+        LabDuration: data.labDuration,
+        StartTime: data.startTime
+    }
     const subjects = TimeTable.Subjects;
     const tt = Array.from({ length: days.length }, () => []);
 

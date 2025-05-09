@@ -25,7 +25,8 @@ export const getClassesByOrgId = async (orgId) => {
 };
 
 export const getOrgNameByOrgId = async (orgId) => {
-  return await usersCollection.findOne({ UserId: orgId });
+  const user = await usersCollection.findOne({ UserId: orgId });
+  return user ? user.Name : null;
 };
 
 export const getStudentsByOrgIdAndClass = async (absentData) => {

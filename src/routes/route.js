@@ -9,7 +9,7 @@ export const router = express.Router();
 
 router.get('/delete/timetable', deleteTT)
 router.post('/upload/timetable', uploadTimetable)
-router.post('/upload/timetable', generateTimetable)
+router.post('/generate/timetable', generateTimetable)
 
 // user routes
 export const userRouter = express.Router();

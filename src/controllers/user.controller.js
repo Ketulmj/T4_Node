@@ -1,4 +1,4 @@
-import { getTeachersByOrgId, getClassesByOrgId, getStudentsByOrgIdAndClass, getTeacherScheduleList, updateUser } from '../services/user.service.js';
+import { getTeachersByOrgId, getClassesByOrgId, getOrgNameByOrgId, getStudentsByOrgIdAndClass, getTeacherScheduleList, updateUser } from '../services/user.service.js';
 import { decodeJwt } from '../utils/auth.js';
 import sendAbsenceEmail from '../mails/absence.mail.js';
 
@@ -8,7 +8,6 @@ const classes = [
     ["Class VI", "Class VII", "Class VIII", "Class IX", "Class X", "Class XI", "Class XII"],
     ["1st Year", "2nd Year", "3th Year", "4th Year", "5th Year", "6th Year", "7th Year",  "8th Year"]
 ];
-
 
 // Get teachers
 export const getTeachers = async (req, res) => {
@@ -32,8 +31,8 @@ export const getUser = (req, res) => {
 export const teacherAbsent = async (req, res) => {
     const absentData = req.body;
     const studentList = await getStudentsByOrgIdAndClass(absentData);
-    const filteredStudentsEmailList = studentList.map(student => student.email);
-    const orgName = (await getOrgNameByOrgId(absentData.orgId)).name;
+    const filteredStudentsEmailList = studentList.map(student => student.Email);
+    const orgName = (await getOrgNameByOrgId(absentData.orgId)).Name;
     sendAbsenceEmail(filteredStudentsEmailList, absentData.name, absentData.subjectName, orgName, absentData.date);
     return res.json({ status: 200, message: "Mail sent to all students" });
 };
@@ -64,9 +63,9 @@ export const changePassword =async (req, res) => {
 
 // Get teacher schedules
 export const getSchedule = async (req, res) => {
-    const teacherId = req.query.teacherId;
-    const schedule = (await getTeacherScheduleList(teacherId));
-    if (!schedule) return res.json({ error: true, message: "No schedule found" });
-    const scheduleList = schedule.Schedule;
-    return res.json({ scheduleList });
+    const teacherId = req.query.TeacherId;
+    const scheduleList = (await getTeacherScheduleList(teacherId));
+    if (!scheduleList) return res.json({ error: true, message: "No schedule found" });
+    const schedule = scheduleList.Schedule;
+    return res.json({ schedule });
 };
