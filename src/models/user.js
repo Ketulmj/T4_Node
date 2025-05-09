@@ -1,13 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'; 
+
+const Teacher = new mongoose.Schema({
+  Name: String,
+  TeacherId: String
+});
+
+const Subject = new mongoose.Schema({
+  Name: String,
+  IsLab: Boolean,
+  Teacher: Teacher
+});
 
 const Schedule = new mongoose.Schema({
   StartTime: Number,
   Day: Number,
   ClassName: String,
-  Subject: String,
+  Subject: Subject,
   IsLab: Boolean,
-  Duration: Number,
-  TeacherId: String
+  Duration: Number
 });
 
 const User = new mongoose.Schema({
@@ -34,6 +44,4 @@ const User = new mongoose.Schema({
   }
 });
 
-const user = mongoose.model('User', User);
-
-export default user;
+export default User;

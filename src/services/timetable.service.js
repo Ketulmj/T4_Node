@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
-import TimetableData from '../models/timetable.js';
-import user from '../models/user.js';
+import Timetables from '../models/timetable.js';
+import User from '../models/user.js';
 
-const timetableCollection = mongoose.connection.collection('Timetables'); // Ensure the collection name matches your MongoDB setup
+const timetableCollection = mongoose.connection.collection('Timetables', Timetables);
+const usersCollection = mongoose.connection.collection('Users', User);
 
 export const getTimetableDataByOrgId = async (orgId) => {
   return await timetableCollection.find({ OrgId: orgId }).toArray();
@@ -17,20 +18,18 @@ export const getTimetable = async (className, orgId) => {
 };
 
 export const deleteTimetable = async (timeTableId) => {
-  // Find the timetable to get the periods
-  const timetable = await TimetableData.findOne({ _id: mongoose.Types.ObjectId(timeTableId) });
-  
+  const timetable = await timetableCollection.findOne({ _id: mongoose.Types.ObjectId(timeTableId) });
+
   if (timetable) {
-    // Delete schedules for each period in the timetable
     for (const day of timetable.Timetable) {
       for (const period of day) {
-        await user.updateMany(
+        usersCollection.deleteMany(
           { 'Schedule.TeacherId': period.Subject.Teacher.TeacherId },
           { $pull: { Schedule: { StartTime: period.StartTime, ClassName: timetable.Class } } }
         );
       }
     }
-    // Delete the timetable
-    await TimetableData.deleteOne({ _id: mongoose.Types.ObjectId(timeTableId) });
+  } else {
   }
+  await timetableCollection.deleteOne({ _id: mongoose.Types.ObjectId(timeTableId) });
 };

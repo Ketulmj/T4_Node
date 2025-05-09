@@ -14,8 +14,12 @@ export const getTTmetadata = async (req, res) => {
 };
 
 export const deleteTT = async (req, res) => {
-    await deleteTimetable(req.query.id);
-    res.json({ error: false, result: "TimeTable Deleted" });
+    try {
+        await deleteTimetable(req.query.id);
+        res.json({ error: false, result: "TimeTable Deleted" });
+    } catch (error) {
+        res.json({ error: true, result: "Error Deleting TimeTable" });
+    }
 };
 
 async function getScheduleListForAllTeachers(teachers) {
@@ -128,7 +132,7 @@ export const generateTimetable = async (req, res) => {
                 ClassName: TimeTable.Class,
                 Day: dayIdx,
                 TeacherId: selectedSubject.Teacher.TeacherId,
-                Subject: selectedSubject.Name,
+                Subject: selectedSubject,
                 IsLab: selectedSubject.IsLab,
                 Duration: selectedSubject.IsLab ? TimeTable.LabDuration : TimeTable.PeriodDuration
             });

@@ -16,7 +16,7 @@ const Period = new mongoose.Schema({
   Subject: Subject
 });
 
-const TimetableDataSchema = new mongoose.Schema({
+const TimetableData = new mongoose.Schema({
   OrgId: {
     type: String,
     required: true
@@ -44,7 +44,5 @@ const TimetableDataSchema = new mongoose.Schema({
     default: []
   }
 });
-
-const TimetableData = mongoose.model('TimetableData', TimetableDataSchema);
 
 export default TimetableData;

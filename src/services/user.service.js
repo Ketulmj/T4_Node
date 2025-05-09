@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 import { idGenerator } from '../utils/idGenerator.js';
+import User from '../models/user.js';
 
-const usersCollection = mongoose.connection.collection('Users');
+const usersCollection = mongoose.connection.collection('Users', User);
 
 export const getUserByEmail = async (email) => {
   return await usersCollection.findOne({ Email: email });
