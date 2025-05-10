@@ -1,35 +1,37 @@
 import mongoose from 'mongoose';
-import Timetables from '../models/timetable.js';
-import User from '../models/user.js';
-
-const timetableCollection = mongoose.connection.collection('Timetables', Timetables);
-const usersCollection = mongoose.connection.collection('Users', User);
+import Timetables from '../models/timetable.model.js';
+import User from '../models/user.model.js';
 
 export const getTimetableDataByOrgId = async (orgId) => {
-  return await timetableCollection.find({ OrgId: orgId }).toArray();
+  return await Timetables.find({ OrgId: orgId });
 };
 
 export const insertTimetableData = async (timetableData) => {
-  await timetableCollection.insertOne(timetableData);
+  await Timetables.create(timetableData);
 };
 
 export const getTimetable = async (className, orgId) => {
-  return await timetableCollection.findOne({ Class: className, OrgId: orgId });
+  return await Timetables.findOne({ Class: className, OrgId: orgId });
 };
 
 export const deleteTimetable = async (timeTableId) => {
-  const timetable = await timetableCollection.findOne({ _id: mongoose.Types.ObjectId(timeTableId) });
-
-  if (timetable) {
-    for (const day of timetable.Timetable) {
-      for (const period of day) {
-        usersCollection.deleteMany(
-          { 'Schedule.TeacherId': period.Subject.Teacher.TeacherId },
-          { $pull: { Schedule: { StartTime: period.StartTime, ClassName: timetable.Class } } }
-        );
+  try {
+    const timetable = await Timetables.findOneAndDelete({ _id: mongoose.Types.ObjectId(timeTableId) });
+    if (timetable) {
+      for (const day of timetable.Timetable) {
+        for (const period of day) {
+          const teacher = await User.findOne({ 'UserId': period.Subject.Teacher.TeacherId });
+          if (teacher) {
+            teacher.Schedule = teacher.Schedule.filter(schedule => schedule.StartTime !== period.StartTime || schedule.ClassName !== timetable.Class);
+            await teacher.save();
+          }
+        }
       }
+    } else {
+      console.error("Timetable not found for deletion");
+      return null;
     }
-  } else {
+  } catch (error) {
+    console.error("Error deleting timetable:", error);
   }
-  await timetableCollection.deleteOne({ _id: mongoose.Types.ObjectId(timeTableId) });
 };

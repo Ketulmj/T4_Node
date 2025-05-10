@@ -1,57 +1,50 @@
-import mongoose from 'mongoose';
 import { idGenerator } from '../utils/idGenerator.js';
-import User from '../models/user.js';
-
-const usersCollection = mongoose.connection.collection('Users', User);
+import User from '../models/user.model.js';
 
 export const getUserByEmail = async (email) => {
-  return await usersCollection.findOne({ Email: email });
+  return await User.findOne({ Email: email });
 };
 
 export const createUser = async (userData) => {
-  userData.UserId = idGenerator(userData.Role);
-  try {
-    await usersCollection.insertOne(userData);
-  } catch (error) {
-    throw error;
-  }
+  if(!userData.UserId)  userData.UserId = idGenerator(userData.Role);
+  return await User.create(userData);
 };
 
 export const getTeachersByOrgId = async (orgId) => {
-  return await usersCollection.find({ OrgId: orgId, Role: 'teacher' }).toArray();
+  return await User.find({ OrgId: orgId, Role: 'teacher' });
 };
 
 export const getClassesByOrgId = async (orgId) => {
-  return await usersCollection.findOne({ UserId: orgId });
+  return await User.findOne({ UserId: orgId });
 };
 
 export const getOrgNameByOrgId = async (orgId) => {
-  const user = await usersCollection.findOne({ UserId: orgId });
+  const user = await User.findOne({ UserId: orgId });
   return user ? user.Name : null;
 };
 
 export const getStudentsByOrgIdAndClass = async (absentData) => {
-  return await usersCollection.find({ OrgId: absentData.OrgId, Class: absentData.Class, Role: 'student' }).toArray();
+  return await User.find({ OrgId: absentData.OrgId, Class: absentData.Class, Role: 'student' });
 };
 
 export const getOrganizationByOrgId = async (orgId) => {
-  return await usersCollection.findOne({ UserId: orgId });
+  return await User.findOne({ UserId: orgId });
 };
 
 export const getTeacherScheduleList = async (teacherId) => {
-  return await usersCollection.findOne({ UserId: teacherId });
+  return await User.findOne({ UserId: teacherId });
 };
 
 export const updateUser = async (email, newPassword) => {
   const filter = { Email: email };
   const update = { $set: { Password: newPassword } };
-  const result = await usersCollection.updateOne(filter, update);
-  return result.modifiedCount > 0;
+  const result = await User.updateOne(filter, update);
+  return result.nModified > 0;
 };
 
 export const addScheduleToTeacher = async (teacherId, schedule) => {
   const filter = { UserId: teacherId };
   const update = { $push: { Schedule: schedule } };
-  const result = await usersCollection.updateOne(filter, update);
+  const result = await User.updateOne(filter, update);
   return result.modifiedCount > 0;
 };

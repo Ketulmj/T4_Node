@@ -6,7 +6,7 @@ const secretKey = process.env.SECRET_KEY;
 
 function encodeJwt(data) {
   const token = jwt.sign({ data: JSON.stringify(data) }, secretKey, {
-    expiresIn: '30m'
+    expiresIn: '1h'
   });
   return token;
 }

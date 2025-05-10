@@ -45,4 +45,5 @@ const TimetableData = new mongoose.Schema({
   }
 });
 
-export default TimetableData;
+const timetables = mongoose.model('Timetables', TimetableData);
+export default timetables;

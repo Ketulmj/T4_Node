@@ -1,108 +1,134 @@
+import bcrypt from 'bcryptjs';
 import { createPendingUser, getPendingUser, deletePendingUser } from '../services/pendingUser.service.js';
 import { createUser, getUserByEmail, getOrganizationByOrgId } from '../services/user.service.js';
 import { encodeJwt } from '../utils/auth.js';
-import sendApprovalSuccessEmail from '../mails/approval.mail.js';
-import sendDeclineMail from '../mails/decline.mail.js';
-import sendAuthMail from '../mails/auth.mail.js';
+import sendApprovalSuccessEmail from '../mail-templates/approval.mail.js';
+import sendDeclineMail from '../mail-templates/decline.mail.js';
+import sendAuthMail from '../mail-templates/auth.mail.js';
 
 export const getAuth = async (req, res) => {
-    const orgId = req.query.id;
-    const approve = req.query.answer;
-    const deletedUser = (await deletePendingUser(orgId)).value;
+    try {
+        const orgId = req.query.id;
+        const approve = req.query.answer;
+        const deletedUser = await deletePendingUser(orgId);
 
-    if (approve === "true") {
-        await createUser(deletedUser);
-        sendApprovalSuccessEmail(deletedUser.Name, deletedUser.Email);
-        return res.json({ message: "Your application is approved by authority" });
-    } else {
-        sendDeclineMail(deletedUser.Email);
-        return res.json({ message: "Your application is not approved by authority" });
+        if (approve === "true") {
+            const user = {
+                Name: deletedUser.Name,
+                Email: deletedUser.Email,
+                Password: deletedUser.Password,
+                Role: deletedUser.Role,
+                UserId: deletedUser.UserId,
+                OrgType: deletedUser.OrgType
+            }
+            await createUser(user);
+            sendApprovalSuccessEmail(user.Name, user.Email);
+            res.json({ message: "Application is approved" });
+        } else {
+            sendDeclineMail(deletedUser.Email);
+            res.json({ message: "Application is declined" });
+        }
+    } catch (error) {
+        console.error("Internal Server Error", error);
+        return res.status(500).send("Internal Server Error");
     }
 };
 
 export const userSignup = async (req, res) => {
-    const user = req.body
-    // console.log(user)
-    const userExist = await getUserByEmail(user.email);
-    if (userExist) return res.json({ error: true, message: "User already exists" });
-    
-    const pendingUserExist = await getPendingUser(user.email);
-    if (pendingUserExist) return res.json({ error: true, message: "Your request has not been approved yet" });
+    try {
+        const user = req.body;
+        const userExist = await getUserByEmail(user.email);
+        if (userExist) { return res.status(400).json({ error: true, message: "User already exists" }); }
 
-    if (user.role !== "organization") {
-        const orgExist = await getOrganizationByOrgId(user.orgId);
-        if (!orgExist) return res.json({ error: true, message: "This Organization does not exist" });
+        const pendingUserExist = await getPendingUser(user.email);
+        if (pendingUserExist) { return res.status(400).json({ error: true, message: "Your request has not been approved yet" }); }
 
-        try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(user.password, salt);
+
+        if (user.role === "organization") {
             const newUser = {
                 Name: user.name,
                 Email: user.email,
-                Password: user.password,
+                Password: hashedPassword,
+                Role: user.role,
+                OrgType: user.orgType
+            }
+            const org = await createPendingUser(newUser);
+            sendAuthMail(org);
+            return res.json({ error: false, message: "Application sent successfully!" });
+        }
+        else if (user.role === "teacher" || user.role === "student") {
+            const orgExist = await getOrganizationByOrgId(user.orgId);
+            if (!orgExist) { return res.json({ error: true, message: "This Organization does not exist" }); }
+            const newUser = {
+                Name: user.name,
+                Email: user.email,
+                Password: hashedPassword,
                 Role: user.role,
                 OrgId: user.orgId
             }
-            user.role == 'student' ? newUser.Class = user.class : newUser.Schedule = []
-            await createUser(newUser);
-            const token = encodeJwt({
-                userId: user.userId,
-                name: user.name,
-                email: user.email,
-                role: user.Role,
-                orgId: user.OrgId,
-                className: user.class
-            });
-            res.cookie('auth', token, { expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) });
-        } catch (error) {
-            throw error;
+            if (user.role === "student")
+                newUser.Class = user.class;
+            else
+                newUser.Schedule = [];
+            const usr = await createUser(newUser);
+            const token = {
+                name: usr.Name,
+                email: usr.Email,
+                role: usr.Role,
+                orgId: usr.OrgId,
+                className: usr.Class,
+                userId: usr.UserId
+            };
+            return res
+                .cookie('auth', encodeJwt(token), { expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
+                .json({ error: false, message: "User created successfully", userData: token });
         }
-        return res.json({
-            message: "User created successfully"
-        });
-    } else {
-        const newUser = {
-            Name: user.name,
-            Email: user.email,
-            Password: user.password,
-            Role: user.role,
-            OrgType: user.orgType
+        else {
+            return res.json({ error: true, message: "Invalid Role" });
         }
-        const org = await createPendingUser(newUser);
-        sendAuthMail(org);
-        return res.json({
-            error: false,
-            message: "Logged In"
-        });
+    } catch (error) {
+        console.error("Internal Server Error", error);
+        return res.status(500).send("Internal Server Error");
     }
 };
 
 // For login
 export const userLogin = async (req, res) => {
-    const user = req.body;
-    const userExist = await getUserByEmail(user.email);
-    if (userExist) {
-        if (userExist.Password === user.password) {
-            // console.log(userExist);
-            const userdata = {
-                userId: userExist.UserId,
-                name: userExist.Name,
-                email: userExist.Email,
-                role: userExist.Role,
-                orgId: userExist.OrgId,
-                className: userExist.Class
-            };
-            const token = encodeJwt(userdata);
-            res.cookie('auth', token, { expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) });
-            return res.json({
-                error: false,
-                redirectUrl: "/timetable",
-                message: "Successfully Login",
-                userData: userdata
-            });
+    try {
+        const user = req.body;
+        const userExist = await getUserByEmail(user.email);
+        if (userExist) {
+            const password = await bcrypt.compare(user.password, userExist.Password);
+            if (password) {
+                const userdata = {
+                    userId: userExist.UserId,
+                    name: userExist.Name,
+                    email: userExist.Email,
+                    role: userExist.Role,
+                    orgId: userExist.OrgId,
+                    className: userExist.Class
+                };
+                const token = encodeJwt(userdata);
+                return res
+                    .cookie('auth', token, { expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) })
+                    .json({
+                        error: false,
+                        redirectUrl: "/dashboard",
+                        message: "Successfully Login",
+                        userData: userdata
+                    });
+            } else {
+                return res.json({ error: true, redirectUrl: "/login", message: "Password Incorrect" });
+            }
         } else {
-            return res.json({ error: true, redirectUrl: "/login", message: "Password Incorrect" });
+            return  res.status(400).json({ error: true, redirectUrl: "/login", message: "User not exists" });
         }
+    } catch (error) {
+        console.error("Internal Server Error", error);
+        return res.status(500).send("Internal Server Error");
     }
-    return res.json({ error: true, redirectUrl: "/login", message: "User not exists" });
 };
 
 // Logout
@@ -110,6 +136,6 @@ export const userLogout = (req, res) => {
     const auth = req.cookies.auth;
     if (auth) {
         res.clearCookie('auth');
+        res.json({ status: true });
     }
-    return res.json({ status: true });
 };

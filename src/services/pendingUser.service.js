@@ -1,19 +1,21 @@
-import mongoose from 'mongoose';
+import pendingUser from '../models/pendinguser.model.js';
 import { idGenerator } from '../utils/idGenerator.js';
-
-const usersCollection = mongoose.connection.collection('PendingUsers'); 
 
 export async function createPendingUser(user) {
   user.UserId = idGenerator('organization', 15);
-  await usersCollection.insertOne(user);
+  await pendingUser.create(user);
   return [user.UserId, user.Name];
 }
 
 export async function getPendingUser(email) {
-  return await usersCollection.findOne({ Email: email });
+  return await pendingUser.findOne({ Email: email });
 }
 
 export async function deletePendingUser(orgId) {
-  const filter = { UserId: orgId };
-  return await usersCollection.findOneAndDelete(filter);
+  try {
+    const user = await pendingUser.findOneAndDelete({ UserId: orgId });
+      return user;
+  } catch (error) {
+    console.error(error);
+  }
 }

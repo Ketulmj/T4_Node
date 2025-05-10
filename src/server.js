@@ -8,14 +8,16 @@ import cookieParser from 'cookie-parser'
 const app = express();
 const PORT = process.env.PORT || 3000;
 env.config()
-app.use(cookieParser());
 
 // Middlewares
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_ORIGIN,
   credentials: true
 }));
-app.use(express.json());
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URL, {
@@ -24,7 +26,7 @@ mongoose.connect(process.env.MONGODB_URL, {
 }).then(() =>
   console.log('Connected to MongoDB'));
 
-// Middleware and routes setup
+// routes
 app.use('/api', router);
 app.use('/api/user', userRouter);
 app.use('/api/get', getRouter);
