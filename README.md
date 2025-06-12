@@ -5,7 +5,7 @@
 ## 📌 Table of Contents
 
 - [Features](#-features)
-- [Tech Stack](#-tech-stack-(mern))
+- [Tech Stack](#-tech-stack)
 - [User Roles](#-user-roles)
 - [Mailing Services](#-mailing-services)
 
@@ -19,7 +19,7 @@
 - SMTP-powered mailing services
 - Clean and Modern UI
 
-## 🛠️ Tech Stack (MERN)
+## 🛠️ Tech Stack
 
 |    Layer          | Technology          |
 |-------------------|---------------------|
@@ -29,16 +29,16 @@
 |    Mailing        | Nodemailer (SMTP)   |
 |    Hosting        | Vercel (Frontend)   |
 
-## 🏗 User Roles
-### Organization
+## 👥 User Roles
+### 🏢 Organization
 - Create/manage weekly timetables
 - Share signup links for Teachers & Students
 
-### Teacher
+### 👨‍🏫 Teacher
 - Views personal weekly schedule
 - Mark absences (triggers email to students)
 
-### Student
+### 🎓 Student
 - View class-specific timetable
 - Receive real-time email absence notifications
 
