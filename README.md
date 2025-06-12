@@ -5,8 +5,8 @@
 ## 📌 Table of Contents
 
 - [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [User Roles](#-user-roles-(mern))
+- [Tech Stack](#-tech-stack-(mern))
+- [User Roles](#-user-roles)
 - [Mailing Services](#-mailing-services)
 
 ## ✨ Features
