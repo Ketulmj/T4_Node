@@ -1,4 +1,6 @@
 import sendEmail from '../services/email.service.js';
+import env from 'dotenv';
+env.config();
 
 const sendForgetPasswordMail = async (email, encodedLink) => {
   const senderName = "Time Fourthe";
@@ -44,7 +46,7 @@ const sendForgetPasswordMail = async (email, encodedLink) => {
                     </p>
                     <!-- Reset Button -->
                     <div style='text-align:center; margin-top:20px;'>
-                      <a href='http://localhost:5173/reset-password?id=${encodedLink}' 
+                      <a href='${process.env.CLIENT_ORIGIN}/reset-password?id=${encodedLink}'
                          style='display:inline-block; background: #FFFFFF; padding:12px 30px; color:#000000; text-decoration:none; font-weight:bold; border-radius:6px; font-size:14px; box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.3); transition: all 0.3s ease;'>
                         🔑 Reset Password
                       </a>

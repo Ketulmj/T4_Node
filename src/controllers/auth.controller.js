@@ -23,10 +23,10 @@ export const getAuth = async (req, res) => {
             }
             await createUser(user);
             sendApprovalSuccessEmail(user.Name, user.Email);
-            res.json({ message: "Application is approved" });
+            return res.json({ message: "Application is approved" });
         } else {
             sendDeclineMail(deletedUser.Email);
-            res.json({ message: "Application is declined" });
+            return res.json({ message: "Application is declined" });
         }
     } catch (error) {
         console.error("Internal Server Error", error);

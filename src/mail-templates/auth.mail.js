@@ -1,4 +1,6 @@
 import sendEmail from '../services/email.service.js';
+import env from 'dotenv';
+env.config()
 
 const sendAuthMail = async (org) => {
   const orgName = org[1];
@@ -46,11 +48,11 @@ const sendAuthMail = async (org) => {
                     </p>
                     <!-- Buttons -->
                     <div style='text-align:center; margin-top:20px;'>
-                      <a href='http://localhost:3000/api/get/auth?id=${orgId}&answer=true' 
+                      <a href='${process.env.SERVER_ORIGIN}/api/get/auth?id=${orgId}&answer=true' 
                          style='display:inline-block; background: #4CAF50; padding:10px 30px; color:#fff; text-decoration:none; font-weight:bold; border-radius:6px; font-size:14px; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); transition: all 0.3s ease;'>
                         Approve
                       </a>
-                      <a href='http://localhost:3000/api/get/auth?id=${orgId}&answer=false' 
+                      <a href='${process.env.SERVER_ORIGIN}/api/get/auth?id=${orgId}&answer=false' 
                          style='display:inline-block; background: #E53935; padding:10px 40px; color:#fff; text-decoration:none; font-weight:bold; border-radius:6px; font-size:14px; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); transition: all 0.3s ease; margin-left:10px;'>
                         Deny
                       </a>

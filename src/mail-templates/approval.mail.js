@@ -1,4 +1,6 @@
 import sendEmail from '../services/email.service.js';
+import env from 'dotenv';
+env.config();
 
 const sendApprovalSuccessEmail = async (orgName, email) => {
   const htmlContent = `
@@ -53,7 +55,7 @@ const sendApprovalSuccessEmail = async (orgName, email) => {
                     </p>
 
                     <div style='text-align:center; margin:20px;'>
-                      <a href='http://localhost:5173/login' style='
+                      <a href='${process.env.CLIENT_ORIGIN}/login' style='
                         display:inline-block;
                         background: #4CAF50;
                         color: #FFFFFF;
