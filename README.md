@@ -48,4 +48,3 @@
 - Authorization Success – mail for approval/rejection status
 - Password Reset – triggered on forgot password
 - Absence Notification – to respective class students when a teacher is absent
-- 
