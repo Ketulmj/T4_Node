@@ -1,4 +1,4 @@
-import pendingUser from '../models/pendinguser.model.js';
+import pendingUser from '../models/pendingUser.model.js';
 import { idGenerator } from '../utils/idGenerator.js';
 
 export async function createPendingUser(user) {
