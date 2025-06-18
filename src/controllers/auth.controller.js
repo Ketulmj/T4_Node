@@ -115,7 +115,7 @@ export const userLogin = async (req, res) => {
                     className: userExist.Class
                 };
                 const token = encodeJwt(userdata);
-                return res.cookie('auth', encodeJwt(token), {
+                return res.cookie('auth', token, {
                       secure: true,
                       httpOnly: true,
                       sameSite: 'None',
@@ -131,7 +131,7 @@ export const userLogin = async (req, res) => {
                 return res.json({ error: true, redirectUrl: "/login", message: "Password Incorrect" });
             }
         } else {
-            return  res.status(400).json({ error: true, redirectUrl: "/login", message: "User not exists" });
+            return res.json({ error: true, redirectUrl: "/login", message: "User not exists" });
         }
     } catch (error) {
         console.error("Internal Server Error", error);
@@ -141,9 +141,15 @@ export const userLogin = async (req, res) => {
 
 // Logout
 export const userLogout = (req, res) => {
-    const auth = req.cookies.auth;
-    if (auth) {
-        res.clearCookie('auth');
-        res.json({ status: true });
-    }
+  const auth = req.cookies.auth;
+  if (auth) {
+    res.clearCookie("auth", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
+    return res.json({ status: true, message: "Logged out successfully" });
+  }
+  return res.status(400).json({ status: false, message: "No auth token found" });
 };
+
