@@ -5,19 +5,20 @@ import env from 'dotenv'
 import { router, userRouter, getRouter } from './routes/route.js'
 import cookieParser from 'cookie-parser'
 
+env.config()
 const app = express();
 const PORT = process.env.PORT || 3000;
-env.config()
+console.log("client : " + process.env.CLIENT_ORIGIN);
 
 // Middlewares
-app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
 app.use(cors({
   origin: process.env.CLIENT_ORIGIN,
   credentials: true
 }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(express.static('public'));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URL, {
