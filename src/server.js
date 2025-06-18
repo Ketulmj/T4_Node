@@ -1,11 +1,11 @@
 import express from 'express'
 import mongoose from 'mongoose'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import env from 'dotenv'
-import { router, userRouter, getRouter } from './routes/route.js'
-import cookieParser from 'cookie-parser'
-
 env.config()
+import { router, userRouter, getRouter } from './routes/route.js'
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 console.log("client : " + process.env.CLIENT_ORIGIN);
