@@ -16,7 +16,7 @@ export const userRouter = express.Router();
 
 userRouter.post('/signup', userSignup)
 userRouter.post('/login', userLogin)
-userRouter.get('/get', getUser)
+userRouter.post('/get', getUser)
 userRouter.get('/logout', userLogout)
 userRouter.post('/teacher/absent', teacherAbsent)
 userRouter.post('/update/changepassword', changePassword)
