@@ -82,12 +82,12 @@ export const userSignup = async (req, res) => {
                 userId: usr.UserId
             };
             return res
-                // .cookie('auth', encodeJwt(token), {
-                //   httpOnly: true,
-                //   secure: true,
-                //   sameSite: 'None',
-                //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                // })
+                .cookie('auth', encodeJwt(token), {
+                  httpOnly: true,
+                  secure: true,
+                  SameSite: 'None',
+                  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                })
                 .json({ error: false,
                        message: "Successfully signed up",
                        userData: token,
@@ -121,12 +121,12 @@ export const userLogin = async (req, res) => {
                 };
                 const token = encodeJwt(userdata);
                 return res
-                    // .cookie('auth', token, {
-                    //   secure: true,
-                    //   httpOnly: true,
-                    //   sameSite: 'None',
-                    //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                    // })
+                    .cookie('auth', token, {
+                      secure: true,
+                      httpOnly: true,
+                      SameSite: 'None',
+                      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    })
                     .json({
                         error: false,
                         redirectUrl: "/dashboard",
