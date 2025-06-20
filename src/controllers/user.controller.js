@@ -20,7 +20,7 @@ export const getTeachers = async (req, res) => {
 
 // Get user
 export const getUser = (req, res) => {
-    const auth = req.cookies.auth;
+    const auth = req.body.auth;
     if (auth) {
         res.json({ user: decodeJwt(auth) });
     }
