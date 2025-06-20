@@ -81,13 +81,18 @@ export const userSignup = async (req, res) => {
                 className: usr.Class,
                 userId: usr.UserId
             };
-            return res.cookie('auth', encodeJwt(token), {
-                  httpOnly: true,
-                  secure: true,
-                  sameSite: 'None',
-                  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                })
-                .json({ error: false, message: "Successfully Signup", userData: token });
+            return res
+                // .cookie('auth', encodeJwt(token), {
+                //   httpOnly: true,
+                //   secure: true,
+                //   sameSite: 'None',
+                //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                // })
+                .json({ error: false,
+                       message: "Successfully signed up",
+                       userData: token,
+                       token: encodeJwt(token)
+                 });
         }
         else {
             return res.json({ error: true, message: "Invalid Role" });
@@ -115,17 +120,19 @@ export const userLogin = async (req, res) => {
                     className: userExist.Class
                 };
                 const token = encodeJwt(userdata);
-                return res.cookie('auth', token, {
-                      secure: true,
-                      httpOnly: true,
-                      sameSite: 'None',
-                      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-                    })
+                return res
+                    // .cookie('auth', token, {
+                    //   secure: true,
+                    //   httpOnly: true,
+                    //   sameSite: 'None',
+                    //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    // })
                     .json({
                         error: false,
                         redirectUrl: "/dashboard",
-                        message: "Successfully Login",
-                        userData: userdata
+                        message: "Successfully logged in",
+                        userData: userdata,
+                        token
                     });
             } else {
                 return res.json({ error: true, redirectUrl: "/login", message: "Password Incorrect" });
