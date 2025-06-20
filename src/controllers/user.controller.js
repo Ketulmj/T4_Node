@@ -21,6 +21,8 @@ export const getTeachers = async (req, res) => {
 // Get user
 export const getUser = (req, res) => {
     const auth = req.body.auth;
+    console.log(req.body)
+    console.log(auth)
     if (auth) {
         res.json({ user: decodeJwt(auth) });
     }
