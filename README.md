@@ -28,6 +28,7 @@
 |    Database       | MongoDB             |
 |    Mailing        | Nodemailer (SMTP)   |
 |    Hosting        | Vercel (Frontend)   |
+|    Hosting        | Render (Backend)   |
 
 ## 👥 User Roles
 ### 🏢 Organization
