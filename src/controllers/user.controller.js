@@ -22,7 +22,7 @@ export const getTeachers = async (req, res) => {
 export const getUser = (req, res) => {
     const auth = req.body.token;
     if (auth) {
-        res.json({ user: decodeJwt(auth) });
+        return res.json({ user: decodeJwt(auth) });
     }
     res.json({ error: true, message: "Authorization failed" });
 };
@@ -49,9 +49,9 @@ export const getOrgClasses = async (req, res) => {
                 orgClasses = orgClasses.concat(classes[item]);
             });
         } else {
-            res.json({ error: true, message: "Organization type not found" });
+            return res.json({ error: true, message: "Organization type not found" });
         }
-        res.json({ orgClasses });
+        return res.json({ orgClasses });
     } catch (error) {
         console.error("Error in getOrgClasses:", error);
         res.json({ error: true, message: "Internal Server Error" });
