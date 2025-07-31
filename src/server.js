@@ -8,7 +8,6 @@ import { router, userRouter, getRouter } from './routes/route.js'
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-console.log("client : " + process.env.CLIENT_ORIGIN);
 
 // Middlewares
 app.use(cors({
@@ -22,10 +21,15 @@ app.use(express.static('public'));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() =>
-  console.log('Connected to MongoDB'));
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch(err => {
+    console.error('MongoDB connection error:', err);
+});
+
 
 // routes
 app.use('/api', router);
